@@ -30,15 +30,33 @@
             max-width: 800px; /* Reduced max width for better readability */
             margin: 20px auto; /* Centering boxes */
         }
-        .download-section {
-            display: flex;
-            justify-content: space-around; /* Adjusted spacing */
-            align-items: center;
-            flex-wrap: wrap;
-        }
         .download-buttons {
             display: flex;
             gap: 10px;
+        }
+        .edition {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 24px;
+            border: 1px solid #e6e8eb;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        .edition .tagline {
+            color: #4a4a4a;
+            min-height: 3em;
+        }
+        .edition ul {
+            flex: 1; /* pushes the buttons to a common baseline across cards */
+        }
+        .edition .download-buttons {
+            margin-top: 16px;
+        }
+        .recommended-tag {
+            margin-left: 8px;
+            vertical-align: middle;
         }
         .footer {
             text-align: center;
@@ -73,40 +91,71 @@
         </div>
 
         <div class="box">
-            <h2 class="title is-5">📌 Security Features</h2>
-            <ul class="content">
-                <li>✅ Blocks Private Networks (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16)</li>
-                <li>✅ Disables Network Discovery and File Sharing</li>
-                <li>✅ Disables NetBIOS over TCP/IP</li>
-                <li>✅ Completely Disables IPv6 Components</li>
-                <li>✅ Blocks Remote Desktop Connections</li>
-                <li>✅ Disables Windows Script Host (Prevents VBS and JS script execution)</li>
-                <li>✅ Restricts PowerShell Execution Policy to "Restricted"</li>
-                <li>✅ Implements Software Restriction Policies</li>
-                <li>✅ Disables Registry Tools</li>
-                <li>✅ Disables Task Manager</li>
-                <li>✅ Disables Command Prompt</li>
-                <li>✅ Enables Edge SmartScreen Protection</li>
-                <li>✅ Disables JavaScript JIT Compilation in Edge</li>
-                <li>✅ Restricts Edge Downloads</li>
-                <li>✅ Blocks All Edge Extensions</li>
-                <li>✅ Disables Browser Autofill and Password Manager</li>
-                <li>✅ Enforces TLS 1.2 Minimum and Certificate Checks</li>
-                <li>✅ Implements Process Whitelisting with SHA256 Verification</li>
-                <li>✅ Generates Detailed Security Reports and Logs</li>
-                <li>✅ Verifies All Applied Settings</li>
-            </ul>
-        </div>
+            <h2 class="title is-5 has-text-centered">📌 Choose a Hardening Profile</h2>
+            <p class="has-text-centered has-text-grey">
+                Two self-contained editions share the same goal &mdash; a browse-only,
+                attack-surface-minimised sandbox &mdash; but take different defensive
+                approaches. Each ships as a one-click EXE or an auditable PowerShell script.
+            </p>
 
-        <div class="box">
-            <div class="download-section">
-                <div class="download-buttons">
-                    <a href="HardenSandbox.exe" class="button is-primary is-large">
-                        🔒 Download EXE
-                    </a>
-                    <a href="HardenSandbox.ps1" class="button is-link is-large">
-                        🖥️ Download PowerShell
-                    </a>
+            <div class="columns mt-4">
+                <!-- ───────────── Classic edition ───────────── -->
+                <div class="column">
+                    <div class="edition">
+                        <h3 class="title is-5">🛡️ Classic</h3>
+                        <p class="tagline">
+                            Lockdown by <strong>removal &amp; restriction</strong>. Strips out
+                            networking components and locks down the shell to deny attacker
+                            footholds outright.
+                        </p>
+                        <ul class="content">
+                            <li>✅ Black-hole routes for private networks (RFC1918)</li>
+                            <li>✅ Disables IPv6, NetBIOS &amp; network discovery</li>
+                            <li>✅ Software Restriction Policies w/ SHA-256 process allow-list</li>
+                            <li>✅ PowerShell execution policy → Restricted</li>
+                            <li>✅ Disables cmd, Task Manager &amp; registry tools</li>
+                            <li>✅ Edge SmartScreen, no-JIT &amp; locked-down downloads</li>
+                        </ul>
+                        <div class="download-buttons">
+                            <a href="HardenSandbox.exe" class="button is-primary">
+                                🔒 EXE
+                            </a>
+                            <a href="HardenSandbox.ps1" class="button is-link">
+                                🖥️ PowerShell
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ───────────── Fable edition ───────────── -->
+                <div class="column">
+                    <div class="edition">
+                        <h3 class="title is-5">
+                            🦊 Fable
+                            <span class="tag is-success is-light recommended-tag">Newest</span>
+                        </h3>
+                        <p class="tagline">
+                            Lockdown by <strong>containment</strong>. Assumes code may run and
+                            starves it &mdash; default-deny egress, exploit mitigations and a
+                            constrained shell.
+                        </p>
+                        <ul class="content">
+                            <li>✅ Firewall outbound default-deny + minimal browse-only allow-list</li>
+                            <li>✅ Malware-filtering DNS (Quad9); LLMNR/mDNS/NetBIOS off</li>
+                            <li>✅ Defender ASR rules + system-wide DEP/SEHOP/ASLR/CFG</li>
+                            <li>✅ Neuters LOLBins (mshta, certutil, regsvr32…) via IFEO</li>
+                            <li>✅ PowerShell Constrained Language Mode for new sessions</li>
+                            <li>✅ Idempotent, with per-section pass/skip/fail summary</li>
+                        </ul>
+                        <div class="download-buttons">
+                            <a href="harden_fable.exe" class="button is-primary">
+                                🔒 EXE
+                            </a>
+                            <a href="harden_fable.ps1" class="button is-link">
+                                🖥️ PowerShell
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

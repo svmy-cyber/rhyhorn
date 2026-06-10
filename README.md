@@ -2,6 +2,17 @@
 
 A PowerShell-based security hardening tool for Windows systems that implements multiple layers of security controls through a structured, sequence-based approach.
 
+## Editions
+
+Two self-contained editions ship side by side (each as an EXE and a PowerShell script). Both aim for a browse-only, attack-surface-minimised sandbox, but take different approaches:
+
+| Edition | File | Approach | Highlights |
+| --- | --- | --- | --- |
+| **Classic** | `HardenSandbox.ps1` | Lockdown by *removal & restriction* | Black-hole routing for RFC1918, IPv6/NetBIOS off, Software Restriction Policies with SHA-256 allow-list, restricted PS policy, cmd/Task Manager/registry tools disabled |
+| **Fable** | `harden_fable.ps1` | Lockdown by *containment* | Firewall outbound default-deny + minimal allow-list, malware-filtering DNS (Quad9), Defender ASR + DEP/SEHOP/ASLR/CFG, LOLBin neutering via IFEO, PowerShell Constrained Language Mode |
+
+The **Classic** edition is documented in detail below. The **Fable** edition is idempotent and self-documenting — see the header comment in [`harden_fable.ps1`](harden_fable.ps1) for the full rationale and per-section trade-offs.
+
 ## Features
 
 ### Network Security
