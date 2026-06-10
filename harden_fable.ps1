@@ -112,12 +112,17 @@ $EdgeExe = @(
 #    helpers (BITS-style transfer via WebClient, spooler bugs, etc.).
 # ==============================================================================
 Invoke-Hardening 'Services: stop & disable non-essential services' {
+    # IMPORTANT: do NOT disable the Remote Desktop Services stack
+    # (TermService / UmRdpService / SessionEnv). Windows Sandbox projects the
+    # guest desktop to the host over an RDP channel served by these services
+    # (the same VAIL/RDP stack noted in the header). Stopping TermService tears
+    # down the live session and the Sandbox window dies. Inbound *network* RDP
+    # is instead denied non-destructively below (fDenyTSConnections) and at the
+    # firewall (TCP 3389 block in the firewall section), which keeps the
+    # Sandbox's own VMBus display intact.
     $services = @(
         'Spooler',          # Print Spooler - PrintNightmare-class bugs; no printing in sandbox
         'RemoteRegistry',   # Remote registry access - pure lateral-movement surface
-        'TermService',      # Remote Desktop - inbound remote control surface
-        'UmRdpService',     # RDP device redirection
-        'SessionEnv',       # RDP configuration
         'WinRM',            # PowerShell remoting / WSMan - classic lateral movement
         'sshd',             # OpenSSH server, if present
         'ssh-agent',        # SSH key agent, if present
@@ -158,6 +163,11 @@ Invoke-Hardening 'Services: stop & disable non-essential services' {
             Set-RegValue -Path "HKLM:\SYSTEM\CurrentControlSet\Services\$svc" -Name 'Start' -Value 4
         }
     }
+    # Deny inbound *network* RDP without stopping the service the Sandbox needs
+    # for its own display. fDenyTSConnections=1 refuses remote logons; the
+    # Sandbox host->guest VMBus session is unaffected. The firewall section also
+    # hard-blocks TCP 3389 for defence in depth.
+    Set-RegValue -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 1
 }
 
 # ==============================================================================
